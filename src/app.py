@@ -74,9 +74,9 @@ def get_characters():
 
 #Muestra la información de un solo personaje según su id.
 @app.route('/people/<int:people_id>', methods=['GET'])
-def get_single_character(id):
+def get_single_character(people_id):
 
-    single_character = Character.query.get(id)
+    single_character = Character.query.get(people_id)
     return jsonify({
         "msg" : "Ok",
         "character" : single_character.serialize()
