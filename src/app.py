@@ -36,6 +36,7 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+#Listar todos los usuarios del blog.
 @app.route('/user', methods=['GET'])
 def get_users():
 
@@ -54,6 +55,7 @@ def get_users():
 
     return jsonify(response_body), 200
 
+#Listar todos los registros de people en la base de datos
 @app.route('/people', methods=['GET'])
 def get_characters():
 
@@ -70,7 +72,39 @@ def get_characters():
 
     return jsonify(response_body), 200
 
+#Muestra la información de un solo personaje según su id.
+@app.route('/people/<int:people_id>', methods=['GET'])
+def get_single_character(id):
 
+    single_character = Character.query.get(id)
+    return jsonify({
+        "msg" : "Ok",
+        "character" : single_character.serialize()
+    }), 200
+
+#Listar todos los registros de planets en la base de datos.
+@app.route('/planets', methods=['GET'])
+def get_planets():
+
+    planets = Planet.query.all()
+
+    planets_serialized = []
+    for item in planets:
+        planets_serialized.append(item.serialize())
+
+    response_body = {
+        "msg" : "Ok",
+        "result" : planets_serialized
+    }
+
+    return jsonify(response_body), 200
+
+
+#Listar todos los favoritos que pertenecen al usuario actual.
+@app.route('/users/favorites', methods=['GET'])
+def user_favorite():
+
+    pass
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
