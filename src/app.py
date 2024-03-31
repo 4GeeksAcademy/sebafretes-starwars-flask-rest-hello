@@ -114,7 +114,9 @@ def get_single_planet(planet_id):
 @app.route('/users/favorites', methods=['GET'])
 def user_favorite():
 
-    pass
+    favorites = Favorite.query.all()
+    result = list(map(lambda fav: fav.serialize(), favorites))
+    return jsonify(result), 200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
