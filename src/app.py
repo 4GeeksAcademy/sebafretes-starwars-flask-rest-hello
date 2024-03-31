@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Character, Planet, FavoriteCharacter, FavoritePlanet
+from models import db, User, Character, Planet, Favorite
 #from models import Person
 
 app = Flask(__name__)
@@ -98,6 +98,16 @@ def get_planets():
     }
 
     return jsonify(response_body), 200
+
+#Muestra la información de un solo planeta según su id.
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_single_planet(planet_id):
+
+    single_planet = Planet.query.get(planet_id)
+    return jsonify({
+        "msg" : "Ok",
+        "character" : single_planet.serialize()
+    }), 200
 
 
 #Listar todos los favoritos que pertenecen al usuario actual.
