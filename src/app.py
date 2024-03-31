@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Character, Planet, Favorite
+from models import db, User, Character, Planet, FavoriteCharacter, FavoritePlanet
 #from models import Person
 
 app = Flask(__name__)
@@ -40,8 +40,6 @@ def sitemap():
 @app.route('/user', methods=['GET'])
 def get_users():
 
-    #First step
-    #SELECT * FROM user
     users = User.query.all()
 
     users_serialized = []
@@ -114,9 +112,38 @@ def get_single_planet(planet_id):
 @app.route('/users/favorites', methods=['GET'])
 def user_favorite():
 
-    favorites = Favorite.query.all()
-    result = list(map(lambda fav: fav.serialize(), favorites))
-    return jsonify(result), 200
+    userchar_favorites = FavoriteCharacter.query.all()
+    userplanet_favorites = FavoritePlanet.query.all()
+    result1 = list(map(lambda fav: fav.serialize(), userchar_favorites))
+    result2 = list(map(lambda fav: fav.serialize(), userplanet_favorites))
+    return jsonify(result1, result2), 200
+
+
+#Añade un nuevo planet favorito al usuario actual con el id = planet_id
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_new_fav_planet(planet_id):
+
+    user = User.query.first()
+
+    if user:
+        planet = Planet.query.get(planet_id)
+        if planet:
+            fav = FavoritePlanet(user_id = user.id, planet_id = planet_id)
+            db.session.add(fav)
+            db.session.commit()
+            return jsonify({'msg': 'Planet added successfully'}), 200
+        else: return jsonify({'msg': 'Planet not found'}), 404
+    else: return jsonify({'msg': 'User not found'}), 404
+
+#Elimina un planet favorito con el id = planet_id
+@app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
+def delete_planet(planet_id):
+
+    favorite = FavoritePlanet.query.get(planet_id)
+    db.session.delete(favorite)
+    db.session.commit()
+
+    return jsonify({"msg": "Planet deleted"}),200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':

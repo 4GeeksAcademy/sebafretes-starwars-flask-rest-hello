@@ -14,7 +14,6 @@ class User(db.Model):
             "id": self.id,
             "username" : self.username,
             "email": self.email,
-            # do not serialize the password, its a security breach
         }
 
     # def __repr__(self):
@@ -42,8 +41,8 @@ class Planet(db.Model):
             "name" : self.name
         }
 
-class Favorite(db.Model):
-    __tablename__ = 'favorite'
+class FavoriteCharacter(db.Model):
+    __tablename__ = 'favorite_character'
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -52,6 +51,20 @@ class Favorite(db.Model):
     character_id = db.Column(db.Integer, db.ForeignKey('character.id'))
     character = db.relationship(Character)
 
+    def serialize(self):
+        return {
+            "id" : self.id,
+            "user_id" : self.user_id,
+            "character_id" : self.character_id,
+        }
+
+class FavoritePlanet(db.Model):
+    __tablename__ = 'favorite_planet'
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship(User)
+
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'))
     planet = db.relationship(Planet)
 
@@ -59,7 +72,5 @@ class Favorite(db.Model):
         return {
             "id" : self.id,
             "user_id" : self.user_id,
-            "character_id" : self.character_id,
             "planet_id" : self.planet_id
         }
-    
