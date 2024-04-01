@@ -47,8 +47,7 @@ def get_users():
         users_serialized.append(user.serialize())
 
     response_body = {
-        "msg": "Ok",
-        "result" : users_serialized
+        "msg": "Ok", "result" : users_serialized
     }
 
     return jsonify(response_body), 200
@@ -119,23 +118,6 @@ def user_favorite():
     return jsonify(result1, result2), 200
 
 
-#Añade un nuevo planet favorito al usuario actual con el id = planet_id
-@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
-def add_new_fav_planet(planet_id):
-
-    user = User.query.first()
-
-    if user:
-        planet = Planet.query.get(planet_id)
-        if planet:
-            fav = FavoritePlanet(user_id = user.id, planet_id = planet_id)
-            db.session.add(fav)
-            db.session.commit()
-            return jsonify({'msg': 'Planet added successfully'}), 200
-        else: return jsonify({'msg': 'Planet not found'}), 404
-    else: return jsonify({'msg': 'User not found'}), 404
-
-
 #Añade un nuevo people favorito al usuario actual con el id = people_id
 @app.route('/favorite/people/<int:people_id>', methods=['POST'])
 def add_new_fav_character(people_id):
@@ -152,6 +134,23 @@ def add_new_fav_character(people_id):
         else: return jsonify({'msg': 'Character not found'}), 404
     else: return jsonify({'msg': 'User not found'}), 404
 
+
+#Añade un nuevo planet favorito al usuario actual con el id = planet_id
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_new_fav_planet(planet_id):
+
+    user = User.query.first()
+
+    if user:
+        planet = Planet.query.get(planet_id)
+        if planet:
+            fav = FavoritePlanet(user_id = user.id, planet_id = planet_id)
+            db.session.add(fav)
+            db.session.commit()
+            return jsonify({'msg': 'Planet added successfully'}), 200
+        else: return jsonify({'msg': 'Planet not found'}), 404
+    else: return jsonify({'msg': 'User not found'}), 404
+
 #Elimina un planet favorito con el id = planet_id
 @app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
 def delete_planet(planet_id):
@@ -161,6 +160,16 @@ def delete_planet(planet_id):
     db.session.commit()
 
     return jsonify({"msg": "Planet deleted"}),200
+
+#Elimina un people favorito con el id = people_id
+@app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
+def delete_character(people_id):
+
+    favorite = FavoriteCharacter.query.get(people_id)
+    db.session.delete(favorite)
+    db.session.commit()
+
+    return jsonify({"msg": "Character deleted"}),200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
