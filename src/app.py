@@ -135,6 +135,23 @@ def add_new_fav_planet(planet_id):
         else: return jsonify({'msg': 'Planet not found'}), 404
     else: return jsonify({'msg': 'User not found'}), 404
 
+
+#Añade un nuevo people favorito al usuario actual con el id = people_id
+@app.route('/favorite/people/<int:people_id>', methods=['POST'])
+def add_new_fav_character(people_id):
+
+    user = User.query.first()
+
+    if user:
+        character = Character.query.get(people_id)
+        if character:
+            fav = FavoriteCharacter(user_id = user.id, character_id = people_id)
+            db.session.add(fav)
+            db.session.commit()
+            return jsonify({'msg': 'Character added successfully'}), 200
+        else: return jsonify({'msg': 'Character not found'}), 404
+    else: return jsonify({'msg': 'User not found'}), 404
+
 #Elimina un planet favorito con el id = planet_id
 @app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
 def delete_planet(planet_id):
