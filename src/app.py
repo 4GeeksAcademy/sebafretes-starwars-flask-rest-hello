@@ -37,7 +37,7 @@ def sitemap():
     return generate_sitemap(app)
 
 #Listar todos los usuarios del blog.
-@app.route('/user', methods=['GET'])
+@app.route('/users', methods=['GET'])
 def get_users():
 
     users = User.query.all()
@@ -74,10 +74,12 @@ def get_characters():
 def get_single_character(people_id):
 
     single_character = Character.query.get(people_id)
-    return jsonify({
-        "msg" : "Ok",
-        "character" : single_character.serialize()
-    }), 200
+    if single_character:
+        return jsonify({
+            "msg" : "Ok",
+            "character" : single_character.serialize()
+        }), 200
+    else: return jsonify({'msg': 'Character not found'}), 404
 
 #Listar todos los registros de planets en la base de datos.
 @app.route('/planets', methods=['GET'])
@@ -101,10 +103,12 @@ def get_planets():
 def get_single_planet(planet_id):
 
     single_planet = Planet.query.get(planet_id)
-    return jsonify({
-        "msg" : "Ok",
-        "character" : single_planet.serialize()
-    }), 200
+    if single_planet:
+        return jsonify({
+            "msg" : "Ok",
+            "character" : single_planet.serialize()
+        }), 200
+    else: return jsonify({'msg': 'Planet not found'}), 404
 
 
 #Listar todos los favoritos que pertenecen al usuario actual.
@@ -155,21 +159,27 @@ def add_new_fav_planet(planet_id):
 @app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
 def delete_planet(planet_id):
 
-    favorite = FavoritePlanet.query.get(planet_id)
-    db.session.delete(favorite)
-    db.session.commit()
-
-    return jsonify({"msg": "Planet deleted"}),200
+    favorite = FavoritePlanet.query.filter_by(planet_id=planet_id).first()
+    if favorite is None:
+        return jsonify({'msg': 'Planet not found'}), 404
+    
+    else:
+        db.session.delete(favorite)
+        db.session.commit()
+        return jsonify({"msg": f"Planet {favorite.planet_id} deleted"}),200
 
 #Elimina un people favorito con el id = people_id
 @app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
 def delete_character(people_id):
 
-    favorite = FavoriteCharacter.query.get(people_id)
-    db.session.delete(favorite)
-    db.session.commit()
+    favorite = FavoriteCharacter.query.filter_by(character_id=people_id).first()
+    if favorite is None:
+        return jsonify({'msg': 'Character not found'}), 404
 
-    return jsonify({"msg": "Character deleted"}),200
+    else:
+        db.session.delete(favorite)
+        db.session.commit()
+        return jsonify({"msg": f"Character {favorite.character_id}deleted"}),200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
